@@ -1,0 +1,10 @@
+ int Nbnoeuds = 20;
+
+mesh Th = square(Nbnoeuds, Nbnoeuds, [x*2-1,y*2-1]);
+func f= x*y;
+fespace Vh(Th,P2);
+Vh uh, vh;
+real alpha = 5;
+problem extrois(uh,vh,solver=LU)=int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)+vh*uh) + int1d(Th,1,2,3,4)(alpha*uh*vh) - int2d(Th)(f*vh);
+extrois;
+plot(uh,wait = 1);

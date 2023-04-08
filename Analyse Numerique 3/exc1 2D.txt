@@ -1,0 +1,59 @@
+1)
+
+real[int] L2error(2);
+real[int] H1error(2);
+for (int ii =0 ; ii<2;ii++){
+  int Nbnoeuds = 10*(ii+1);
+  mesh Th = square(Nbnoeuds, Nbnoeuds, [x,y]);
+  func f= 2*(2*pi)^2*sin(2*pi*x)*sin(2*pi*y);
+  fespace Vh(Th,P1);
+  Vh uh, vh;
+  problem chaleur(uh,vh,solver=LU)=int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)) - int2d(Th)(f*vh)+on(1,2,3,4,uh=0);
+  chaleur;
+  plot(uh,wait = 1);
+
+  Vh realf = sin(2*pi*x)*sin(2*pi*y); 
+  Vh error = uh-realf;
+
+  L2error[ii] = sqrt(int2d(Th)(error^2));
+  H1error[ii] = sqrt(L2error[ii]^2 + int2d(Th)(dx(error)^2+dy(error)^2));
+}
+
+real convrate = log(L2error[0]/L2error[1])/log(2.);
+
+real cpu = clock();
+
+for (int n= 0; n<2; ++n){
+cout << "L2error pour " << n << " = " << L2error[n]<< endl;
+  cout << "H1error pour " << n << " = " << H1error[n]<< endl;
+  }
+cout << "convergence rate is: " << convrate << endl;
+cout << "time wasted: " << cpu << endl;
+
+
+2)
+
+real[int] L2error(2);
+real[int] H1error(2);
+for (int ii =0 ; ii<2;ii++){
+  int Nbnoeuds = 10*(ii+1);
+  mesh Th = square(Nbnoeuds, Nbnoeuds, [x,y]);
+  func f= 2*(2*pi)^2*sin(2*pi*x)*sin(2*pi*y);
+  fespace Vh(Th,P2);
+  Vh uh, vh;
+  problem chaleur(uh,vh,solver=LU)=int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)) - int2d(Th)(f*vh)+on(1,2,3,4,uh=0);
+  chaleur;
+  plot(uh,wait = 1);
+
+  Vh realf = sin(2*pi*x)*sin(2*pi*y); 
+  Vh error = uh-realf;
+
+  L2error[ii] = sqrt(int2d(Th)(error^2));
+  H1error[ii] = sqrt(L2error[ii]^2 + int2d(Th)(dx(error)^2+dy(error)^2));
+}
+
+real convrate = log(L2error[0]/L2error[1])/log(2.);
+
+real cpu = clock();
+
+cout << "time wasted: " << cpu << endl;

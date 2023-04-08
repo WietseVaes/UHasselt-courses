@@ -1,0 +1,45 @@
+// Parameters
+int nn = 20;		//mesh quality
+real L = 1.;	//geometry length
+real H = 1.;	//geometry height
+
+real uMax = 0.5;	//max inlet velocity
+
+real Mu = 1.;	//viscosity
+real pEps = 1.e-10;	//stabilization term
+
+// Mesh
+mesh Th = square(L*nn, H*nn, [L*x, H*y]);
+
+// Fespace
+fespace Uh(Th, P1);
+Uh Ux, Uy;
+Uh Uhx, Uhy;
+
+fespace Ph(Th, P1);
+Ph p;
+Ph ph;
+
+// Macro
+macro grad(u) [dx(u), dy(u)] //
+macro Grad(U) [grad(U#x), grad(U#y)] //
+macro div(ux, uy) (dx(ux) + dy(uy)) //
+macro Div(U) div(U#x, U#y) //
+
+// Problem
+problem Stokes ([Ux, Uy, p], [Uhx, Uhy, ph])
+	= int2d(Th)(
+		  Mu * (Grad(U) : Grad(Uh))
+		- p *Div(Uh)
+		- ph * Div(U)
+		- pEps * p * ph
+	)
+	+ on(3, Ux=1, Uy=0)
+	+ on(1, 2, 4, Ux=0, Uy=0)
+	;
+
+// Solve
+Stokes;
+
+// Plot
+plot([Ux, Uy], p);

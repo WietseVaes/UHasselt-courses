@@ -1,0 +1,53 @@
+// See https://doc.freefem.org/tutorials/elasticity.html for more information
+
+// Parameters
+int nn = 5;
+real L = 4.;
+real H = 1.;
+
+real Mu = 5.56;
+real Lambda = 1.;
+
+real Fx = 0.;
+real Fy = -1.;
+
+// Mesh
+mesh Th = square(L*nn, H*nn, [L*x, H*y]);
+
+// Fespace
+fespace Uh(Th, P2);
+Uh Ux, Uy;
+Uh Uhx, Uhy;
+
+// Macro
+real sqrt2 = sqrt(2.);
+macro Epsilon(U) [dx(U#x), dy(U#y), div(U#y, U#x)/sqrt2] //
+macro div(ux, uy) (dx(ux) + dy(uy)) //
+macro Div(U) div(U#x, U#y) //
+
+// Problem
+problem Lame ([Ux, Uy], [Uhx, Uhy])
+	= int2d(Th)(
+		  Lambda * Div(U) * Div(Uh)
+		+ 2.*Mu * Epsilon(U)' * Epsilon(Uh)
+	)
+	- int2d(Th)(
+		  [Fx, Fy]' * [Uhx, Uhy]
+	)
+	+ on(4, Ux=0, Uy=0)
+	;
+
+// Solve
+Lame;
+
+// Move mesh
+//Th = movemesh(Th, [x+Ux, y+Uy]);
+Ux=Ux; Uy=Uy;
+Uh Sigma11=Lambda*(dx(Ux)+dy(Uy))+ 2*Mu*dx(Ux);
+Uh Sigma12 = Mu*(dy(Ux)+dx(Uy));
+Uh Sigma21 = Mu*(dx(Ux)+dy(Uy));
+Uh Sigma22 = Lambda*(dx(Ux)+dy(Uy))+ 2*Mu*dy(Uy);
+Uh VonMises = sqrt(Sigma11^2 - Sigma11*Sigma22+Sigma22^2+3*Sigma12^2);
+
+// Plot
+plot(VonMises);

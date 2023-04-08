@@ -1,0 +1,10 @@
+load "msh3" 
+  int n = 10;
+mesh Th2=square(n,n);
+mesh3 Th=buildlayers(Th2,n,zbound=[0,1]); 
+fespace Vh(Th,P13d); //P1 Lagrange finite elements in 3D
+Vh u,v; // u,v belong to Vh
+// and now we use macros to simplify expressions
+macro grad(u) [dx(u),dy(u),dz(u)] //EOM
+solve lapace3d(u,v)=int3d(Th)(grad(u)'*grad(v))+int2d(Th,1)(0.25(0.25-u)*v)-int3d(Th)(f*v)-int2d(Th,2)(v);
+plot(u);

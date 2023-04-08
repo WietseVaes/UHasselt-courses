@@ -1,0 +1,15 @@
+int np = 100;	//mesh quality
+
+mesh Th = square(np,2,[x,y/50]);
+	plot(Th, wait = 1);
+
+	fespace Vh(Th, P1);
+Vh u,v;
+func f= 1.;
+varf a(u,v) = int2d(Th)(dx(u)*dx(v))+on(2,4,u=0.);
+matrix A = a(Vh,Vh);
+varf l(unused, v) = int2d(Th)(f*v)+on(2,4,unused=0.);
+Vh B;
+B[] = l(0,Vh);
+u[] = A^(-1)*B[];
+plot(u, wait=1,fill = 1);

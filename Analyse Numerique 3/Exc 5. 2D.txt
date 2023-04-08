@@ -1,0 +1,22 @@
+ int n = 10;
+int outer = 1;
+int inner = 2;
+
+border C1(t=0, 1){x=t; y=0; label=1;}
+border C2(t=0, 0.5){x=1; y=t; label=2;}
+border C3(t=0.5, 1){x=1-t; y=1; label=3;}
+border C4(t=0, 1){x=0; y=1-t; label=4;}
+border C5(t=0, 0.5){x=1-t; y=0.5; label=5;}
+border C6(t=0.5, 1){x=0.5; y=t; label=6;}
+plot(C1(n) + C2(n) + C3(n) + C4(n) + C5(n) + C6(n));
+
+
+mesh Th = buildmesh(C1(n) + C2(n) + C3(n) + C4(n) + C5(n) + C6(n));
+//plot(Th);
+
+func f= 1;
+fespace Vh(Th,P1);
+Vh uh, vh;
+problem exquat(uh,vh,solver=LU)=int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)) - int2d(Th)(f*vh)+ on(1,2,3,4,5,6,uh=0);
+exquat;
+plot(uh,wait = 1);

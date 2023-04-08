@@ -1,0 +1,8 @@
+  int Nbnoeuds = 10;
+mesh Th = square(Nbnoeuds, Nbnoeuds, [x*2-1,y*2-1]);
+func f= x*y;
+fespace Vh(Th,P1);
+Vh uh, vh;
+problem exdeux(uh,vh,solver=LU)=int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)+vh*uh) - int2d(Th)(f*vh);
+exdeux;
+plot(uh,wait = 1);
